@@ -68,7 +68,7 @@
     var foot = el('div', 'msb-foot');
     foot.innerHTML =
       '<a class="msb-cta msb-cta-call" href="tel:' + PHONE + '">Call +91 83174 45439</a>' +
-      '<a class="msb-cta msb-cta-wa" href="https://wa.me/918317445439" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>' +
+      '<a class="msb-cta msb-cta-wa" href="https://wa.me/919148155617" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>' +
       '<a class="msb-mail" href="mailto:sales@logitechelevators.com">sales@logitechelevators.com</a>';
     var social = document.querySelector('.footer-social');
     if (social) foot.appendChild(social.cloneNode(true));
