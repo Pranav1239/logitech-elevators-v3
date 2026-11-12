@@ -1,0 +1,51 @@
+name: Deploy to cPanel
+
+# Every push to main syncs the site to public_html over FTPS.
+# Only files changed since the last deploy are uploaded; the action keeps a
+# state file (.ftp-deploy-sync-state.json) on the server to track this.
+# Files on the server that were never in this repo (CRM app, cgi-bin, etc.)
+# are never touched.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      HAS_FTP_SECRETS: ${{ secrets.FTP_SERVER != '' && secrets.FTP_USERNAME != '' && secrets.FTP_PASSWORD != '' }}
+    steps:
+      - name: Secrets missing — skipping deploy
+        if: env.HAS_FTP_SECRETS != 'true'
+        run: echo "::warning::FTP_SERVER / FTP_USERNAME / FTP_PASSWORD secrets not set. See DEPLOY.md."
+
+      - name: Checkout
+        if: env.HAS_FTP_SECRETS == 'true'
+        uses: actions/checkout@v4
+
+      - name: Sync to public_html
+        if: env.HAS_FTP_SECRETS == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          # FTP account's home directory must be public_html (see DEPLOY.md)
+          server-dir: ./
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
+            .omc/**
+            .vscode/**
+            **/.DS_Store
+            DEPLOY.md
